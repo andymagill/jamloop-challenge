@@ -17,9 +17,8 @@ export interface Campaign {
   screens: string[]; // CTV, Mobile Device, Web Browser
 }
 
-// Hardcoded CrudCrud.com API URL (replace with your actual endpoint)
-// Get your endpoint from https://crudcrud.com
-const BASE_URL = 'https://crudcrud.com/api/YOUR_RESOURCE_ID_HERE';
+// CrudCrud.com API URL - hardcoded as per PoC requirements
+const BASE_URL = 'https://crudcrud.com/api/de2a072c07d24feeb8cc5c4f4268bcf1';
 
 const CAMPAIGNS_ENDPOINT = '/campaigns';
 
