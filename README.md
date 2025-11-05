@@ -24,7 +24,6 @@ This is a proof-of-concept (PoC) Next.js application that demonstrates strict da
 - **UI Components**: ShadCN UI
 - **Styling**: Tailwind CSS
 - **Data Persistence**: crudcrud.com (temporary REST API for PoC)
-- **Deployment**: Vercel
 
 ## Getting Started
 
