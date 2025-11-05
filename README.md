@@ -14,6 +14,8 @@ This is a proof-of-concept (PoC) Next.js application that demonstrates strict da
 - **Complete CRUD Operations**: Create, read, update, and delete campaigns
 - **Data Isolation**: Client-side filtering ensures users only see their own campaigns
 - **Form Validation**: Real-time validation with user feedback
+- **Edit & Delete**: Full campaign management with update and delete capabilities
+- **Toast Notifications**: Real-time feedback for all operations
 - **Responsive UI**: Built with ShadCN UI components and Tailwind CSS
 
 ### Technology Stack
