@@ -71,8 +71,7 @@ The scope is strictly limited to the secure management of the Campaign data obje
 * **UI Library:** ShadCN UI (Components: Table, Form, Select, DatePicker)  
 * **Styling:** Tailwind CSS  
 * **Database (PoC):** **crudcrud.com** (Temporary, public REST endpoint for data persistence).  
-* **Auth/Session (PoC):** **Hardcoded/Simulated** (Simple state management or cookie/local storage for two fixed users).  
-* **Deployment:** Vercel
+* **Auth/Session (PoC):** **Hardcoded/Simulated** (Simple state management and cookie/local storage). 
 
 ### **4.2 Data Model (PoC Schema Concept)**
 
@@ -93,13 +92,7 @@ A standard campaign object payload sent to the API will look like this:
 1. **Auth Simulation:** The application determines the active user\_id (e.g., 'user\\\_A') from the simulated session (local state/cookie).  
 2. **Isolation Filter (Client-Side):** All data fetched from crudcrud.com must be **client-side filtered** to only display items where the Campaign object's user\_id matches the active user's ID. All write/update actions must ensure the correct user\_id is applied to the payload.
 
-## **5\. Deployment and Operations (PoC)**
-
-* **Hosting:** Vercel.  
-* **Database Connection:** Uses the temporary, public crudcrud.com API endpoint for data persistence.  
-* **Environment Variables:** Only the crudcrud.com resource ID is required.
-
-## **6\. Implementation Plan (MVP Roadmap)**
+## **5\. Implementation Plan**
 
 This roadmap focuses on a three-phase approach to quickly establish the core security layer and CRUD functionality, minimizing complexity in the initial data entry.
 

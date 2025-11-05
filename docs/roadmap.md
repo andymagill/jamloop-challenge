@@ -375,58 +375,6 @@ These features extend campaign functionality and provide business value.
 
 ---
 
-### 4.3 Campaign Templates 🔴
-**Priority:** Medium | **Effort:** Medium | **Business Value:** Medium
-
-**Objective:** Allow users to save and reuse campaign configurations.
-
-**Requirements:**
-- Save campaign as template
-- List of saved templates
-- Create campaign from template
-- Edit/delete templates
-- Share templates across team (future)
-
-**Technical Tasks:**
-- [ ] Create Template data model
-- [ ] Add "Save as Template" button to edit page
-- [ ] Create template listing page
-- [ ] Implement "Create from Template" flow
-- [ ] Add template CRUD operations
-- [ ] Create template preview/details view
-
-**Dependencies:** 2.3 (Production Database)
-
-**User Impact:** Medium - Efficiency for recurring campaigns
-
----
-
-### 4.4 Campaign Notes & Attachments 🔴
-**Priority:** Low | **Effort:** Large | **Business Value:** Low
-
-**Objective:** Allow users to add contextual information to campaigns.
-
-**Requirements:**
-- Rich text notes field
-- File upload (creative assets, contracts)
-- Note history/versioning
-- File preview functionality
-- Download attachments
-
-**Technical Tasks:**
-- [ ] Add notes field to Campaign schema
-- [ ] Integrate rich text editor (TipTap/Quill)
-- [ ] Set up file storage (S3/Cloudinary)
-- [ ] Create file upload component
-- [ ] Add file listing and preview
-- [ ] Implement file download
-
-**Dependencies:** 2.3 (Production Database)
-
-**User Impact:** Low - Nice to have, not critical
-
----
-
 ## **Phase 5: Analytics & Reporting**
 
 **Target:** Q4 2025 - Q1 2026 | **Status:** 🔴 Not Started
@@ -569,31 +517,6 @@ These features enable team collaboration.
 
 ---
 
-### 6.3 Comments & Collaboration 🔴
-**Priority:** Low | **Effort:** Large | **Business Value:** Low
-
-**Objective:** Enable team discussions on campaigns.
-
-**Requirements:**
-- Comment threads on campaigns
-- @mentions for team members
-- Email notifications for mentions
-- Comment history and editing
-- Resolve/unresolve comments
-
-**Technical Tasks:**
-- [ ] Create Comment model
-- [ ] Build commenting UI component
-- [ ] Implement @mention parsing and notifications
-- [ ] Add real-time comment updates (websockets)
-- [ ] Create comment moderation tools
-
-**Dependencies:** 2.1 (Authentication), 6.1 (User Roles)
-
-**User Impact:** Low - Nice to have for teams
-
----
-
 ## **Phase 7: Advanced Features**
 
 **Target:** Q2-Q3 2026 | **Status:** 🔴 Not Started
@@ -652,74 +575,35 @@ These are advanced features for mature product usage.
 
 ---
 
-### 7.3 Mobile App (React Native) 🔴
-**Priority:** Low | **Effort:** Large | **Business Value:** Low
-
-**Objective:** Provide native mobile apps for iOS and Android.
-
-**Requirements:**
-- Campaign viewing on mobile
-- Basic campaign editing
-- Push notifications
-- Offline support (future)
-- Share API for consistent logic
-
-**Technical Tasks:**
-- [ ] Set up React Native project
-- [ ] Share TypeScript types with web app
-- [ ] Build mobile UI components
-- [ ] Implement authentication flow
-- [ ] Add push notification support
-- [ ] Publish to App Store and Play Store
-
-**Dependencies:** 2.1 (Authentication), 7.1 (API)
-
-**User Impact:** Low - Only if mobile usage is high
-
----
-
 ## **Implementation Priority Matrix**
 
-### **Must Have (Q2 2025)**
+### **Must Have **
 1. Server-Side Authentication (2.1)
 2. Server-Side Authorization (2.2)
 3. Production Database (2.3)
 4. Error Boundaries (2.4)
 
-### **Should Have (Q2-Q3 2025)**
+### **Should Have **
 5. Environment Management (2.5)
 6. Pagination & Sorting (3.1)
 7. Search & Filtering (3.2)
 8. Campaign Status (4.1)
 9. Budget Tracking (4.2)
 
-### **Nice to Have (Q3-Q4 2025)**
+### **Nice to Have **
 10. Campaign Duplication (3.3)
 11. Bulk Operations (3.4)
 12. Loading States (3.5)
 13. Campaign Templates (4.3)
 14. Performance Dashboard (5.1)
 
-### **Future Considerations (2026+)**
+### **Future Considerations **
 15. User Roles (6.1)
 16. Notifications (5.2)
 17. Reporting (5.3)
 18. Activity Logs (6.2)
 19. API Access (7.1)
 20. Mobile App (7.3)
-
----
-
-## **Estimated Effort Summary**
-
-| Phase | Total Effort | Timeline |
-|-------|-------------|----------|
-| Phase 2 (Critical) | ~6-8 weeks | Q2 2025 |
-| Phase 3 (UX) | ~4-6 weeks | Q2-Q3 2025 |
-| Phase 4 (Features) | ~6-8 weeks | Q3-Q4 2025 |
-| Phase 5 (Analytics) | ~4-6 weeks | Q4 2025 - Q1 2026 |
-| Phase 6 (Collaboration) | ~6-8 weeks | Q1-Q2 2026 |
-| Phase 7 (Advanced) | ~8-10 weeks | Q2-Q3 2026 |
 
 ---
 
@@ -740,38 +624,8 @@ Each phase should be evaluated against these metrics:
 - Time to create campaign
 - User satisfaction (NPS score)
 - Support ticket reduction
-
-**Product Metrics:**
 - Feature usage analytics
 - User retention rate
-- Conversion from trial to paid (if applicable)
-- API usage (Phase 7)
-
----
-
-## **Decision Log**
-
-This section tracks key architectural decisions made during roadmap implementation.
-
-| Date | Decision | Rationale | Status |
-|------|----------|-----------|--------|
-| 2025-01-XX | Use crudcrud.com for MVP | Rapid prototyping, zero config | ✅ Completed |
-| 2025-01-XX | Client-side auth simulation | Simplify MVP, focus on features | ✅ Completed |
-| 2025-01-XX | Store endpoint in environment variables only | Avoid duplication, endpoint may change | ✅ Completed |
-| TBD | Database choice (PostgreSQL vs MongoDB) | To be decided based on query patterns | 🔴 Pending |
-| TBD | Authentication provider (NextAuth vs Auth0) | To be decided based on cost/features | 🔴 Pending |
-
----
-
-## **Contributing to This Roadmap**
-
-To propose new features or adjust priorities:
-
-1. Create a GitHub issue with the "feature-request" label
-2. Provide business justification and user stories
-3. Estimate implementation effort (Small/Medium/Large)
-4. Link to any relevant user feedback or research
-5. Product team will review quarterly and update roadmap
 
 ---
 
