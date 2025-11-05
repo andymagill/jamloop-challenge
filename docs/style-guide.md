@@ -723,7 +723,7 @@ import { cn } from '@/lib/utils';
 
 ```env
 # .env.local
-NEXT_PUBLIC_CRUDCRUD_ENDPOINT=https://crudcrud.com/api/de2a072c07d24feeb8cc5c4f4268bcf1
+NEXT_PUBLIC_CRUDCRUD_ENDPOINT=https://crudcrud.com/api/7a9ddccaf6e347b7b161e8c1a4d8c394
 ```
 
 ```typescript

@@ -54,8 +54,10 @@ bun install
 
 Create a `.env.local` file in the root directory:
 ```env
-NEXT_PUBLIC_CRUDCRUD_ENDPOINT=https://crudcrud.com/api/de2a072c07d24feeb8cc5c4f4268bcf1
+NEXT_PUBLIC_CRUDCRUD_ENDPOINT=https://crudcrud.com/api/7a9ddccaf6e347b7b161e8c1a4d8c394
 ```
+
+**Note**: CrudCrud.com resource IDs expire after 24 hours. If you encounter API errors, you'll need to generate a new resource ID (see [Updating CrudCrud Resource ID](#updating-crudcrud-resource-id) below).
 
 4. Run the development server:
 ```bash
@@ -101,6 +103,48 @@ jamloop-cms/
 - **[Next.js Documentation](https://nextjs.org/docs)** - Framework documentation
 - **[ShadCN UI](https://ui.shadcn.com/)** - UI component library
 - **[crudcrud.com API](https://crudcrud.com)** - Temporary data persistence service
+
+## Updating CrudCrud Resource ID
+
+CrudCrud.com provides free, temporary REST API endpoints that **expire after 24 hours**. If you see "Failed to fetch" errors or API connection issues, you'll need to generate a new resource ID.
+
+### How to Check if Your Resource ID is Expired
+
+1. Open your browser and navigate to:
+   ```
+   https://crudcrud.com/api/YOUR_RESOURCE_ID/campaigns
+   ```
+   Replace `YOUR_RESOURCE_ID` with your current resource ID from `lib/api/client.ts`.
+
+2. If you see an error page or "Resource not found", the endpoint has expired.
+
+### How to Generate a New Resource ID
+
+1. Visit **[https://crudcrud.com/](https://crudcrud.com/)** in your browser
+
+2. The website will automatically generate a unique resource ID and display it at the top of the page. It will look like:
+   ```
+   https://crudcrud.com/api/a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6
+   ```
+
+3. Copy the **resource ID** (the part after `/api/`). For example: `a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6`
+
+4. Update the resource ID in **`lib/api/client.ts`**:
+   ```typescript
+   const BASE_URL = 'https://crudcrud.com/api/YOUR_NEW_RESOURCE_ID';
+   ```
+
+5. Restart your development server:
+   ```bash
+   npm run dev
+   ```
+
+6. Test the connection by logging in and navigating to the dashboard. You should see the campaigns table without errors.
+
+**Important Notes:**
+- Each CrudCrud endpoint is isolated - data created with one resource ID cannot be accessed by another
+- CrudCrud is for development/PoC only - production apps should use a proper database
+- The free tier has rate limits (create: 1/sec, read: 10/sec, update/delete: 5/sec per resource)
 
 ## Key Security Features (PoC)
 

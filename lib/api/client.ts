@@ -18,7 +18,7 @@ export interface Campaign {
 }
 
 // CrudCrud.com API URL - hardcoded as per PoC requirements
-const BASE_URL = 'https://crudcrud.com/api/de2a072c07d24feeb8cc5c4f4268bcf1';
+const BASE_URL = 'https://crudcrud.com/api/7a9ddccaf6e347b7b161e8c1a4d8c394';
 
 const CAMPAIGNS_ENDPOINT = '/campaigns';
 
@@ -29,24 +29,30 @@ async function apiRequest<T>(
 ): Promise<T> {
   const url = `${BASE_URL}${endpoint}`;
   
-  const response = await fetch(url, {
-    ...options,
-    headers: {
-      'Content-Type': 'application/json',
-      ...options?.headers,
-    },
-  });
+  try {
+    const response = await fetch(url, {
+      ...options,
+      headers: {
+        'Content-Type': 'application/json',
+        ...options?.headers,
+      },
+    });
 
-  if (!response.ok) {
-    throw new Error(`API request failed: ${response.status} ${response.statusText}`);
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`API request failed: ${response.status} ${response.statusText} - ${errorText}`);
+    }
+
+    // DELETE requests typically return no content
+    if (response.status === 204 || options?.method === 'DELETE') {
+      return {} as T;
+    }
+
+    return response.json();
+  } catch (error) {
+    console.error('API Request Error:', error);
+    throw error;
   }
-
-  // DELETE requests typically return no content
-  if (response.status === 204 || options?.method === 'DELETE') {
-    return {} as T;
-  }
-
-  return response.json();
 }
 
 // Get all campaigns (will be filtered client-side by user_id)

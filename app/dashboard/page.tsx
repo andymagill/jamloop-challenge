@@ -29,7 +29,8 @@ export default function DashboardPage() {
         setCampaigns(userCampaigns);
       } catch (err) {
         console.error('Error fetching campaigns:', err);
-        setError('Failed to load campaigns. Please check your API configuration.');
+        const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+        setError(`Failed to fetch campaigns. ${errorMessage.includes('Failed to fetch') ? 'Please check your network connection or ensure the CrudCrud endpoint is accessible.' : errorMessage}`);
       } finally {
         setLoading(false);
       }

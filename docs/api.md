@@ -9,13 +9,13 @@ This document provides complete REST endpoint specifications for the JamLoop Cam
 ### **Environment Variables**
 
 ```env
-NEXT_PUBLIC_CRUDCRUD_ENDPOINT=https://crudcrud.com/api/de2a072c07d24feeb8cc5c4f4268bcf1
+NEXT_PUBLIC_CRUDCRUD_ENDPOINT=https://crudcrud.com/api/7a9ddccaf6e347b7b161e8c1a4d8c394
 ```
 
 ### **Base URL**
 
 ```
-https://crudcrud.com/api/de2a072c07d24feeb8cc5c4f4268bcf1
+https://crudcrud.com/api/7a9ddccaf6e347b7b161e8c1a4d8c394
 ```
 
 All campaign endpoints are prefixed with `/campaigns`.
@@ -100,7 +100,7 @@ GET /campaigns
 
 **Request:**
 ```bash
-curl -X GET https://crudcrud.com/api/de2a072c07d24feeb8cc5c4f4268bcf1/campaigns
+curl -X GET https://crudcrud.com/api/7a9ddccaf6e347b7b161e8c1a4d8c394/campaigns
 ```
 
 **Response: 200 OK**
@@ -170,7 +170,7 @@ GET /campaigns/:id
 
 **Request:**
 ```bash
-curl -X GET https://crudcrud.com/api/de2a072c07d24feeb8cc5c4f4268bcf1/campaigns/65a1b2c3d4e5f6g7h8i9j0k1
+curl -X GET https://crudcrud.com/api/7a9ddccaf6e347b7b161e8c1a4d8c394/campaigns/65a1b2c3d4e5f6g7h8i9j0k1
 ```
 
 **Response: 200 OK**
@@ -250,7 +250,7 @@ Content-Type: application/json
 
 **Request Example:**
 ```bash
-curl -X POST https://crudcrud.com/api/de2a072c07d24feeb8cc5c4f4268bcf1/campaigns \
+curl -X POST https://crudcrud.com/api/7a9ddccaf6e347b7b161e8c1a4d8c394/campaigns \
   -H "Content-Type: application/json" \
   -d '{
     "user_id": "user_A",
@@ -350,7 +350,7 @@ Content-Type: application/json
 
 **Request Example:**
 ```bash
-curl -X PUT https://crudcrud.com/api/de2a072c07d24feeb8cc5c4f4268bcf1/campaigns/65a1b2c3d4e5f6g7h8i9j0k1 \
+curl -X PUT https://crudcrud.com/api/7a9ddccaf6e347b7b161e8c1a4d8c394/campaigns/65a1b2c3d4e5f6g7h8i9j0k1 \
   -H "Content-Type: application/json" \
   -d '{
     "user_id": "user_A",
@@ -430,7 +430,7 @@ DELETE /campaigns/:id
 
 **Request:**
 ```bash
-curl -X DELETE https://crudcrud.com/api/de2a072c07d24feeb8cc5c4f4268bcf1/campaigns/65a1b2c3d4e5f6g7h8i9j0k1
+curl -X DELETE https://crudcrud.com/api/7a9ddccaf6e347b7b161e8c1a4d8c394/campaigns/65a1b2c3d4e5f6g7h8i9j0k1
 ```
 
 **Response: 200 OK**
@@ -635,23 +635,23 @@ You **do not** need to generate IDs client-side.
 
 ```bash
 # Get all campaigns
-curl -X GET https://crudcrud.com/api/de2a072c07d24feeb8cc5c4f4268bcf1/campaigns
+curl -X GET https://crudcrud.com/api/7a9ddccaf6e347b7b161e8c1a4d8c394/campaigns
 
 # Create a campaign
-curl -X POST https://crudcrud.com/api/de2a072c07d24feeb8cc5c4f4268bcf1/campaigns \
+curl -X POST https://crudcrud.com/api/7a9ddccaf6e347b7b161e8c1a4d8c394/campaigns \
   -H "Content-Type: application/json" \
   -d '{"user_id":"user_A","campaign_name":"Test Campaign","budget_goal_usd":10000,"start_date":"2025-06-01","end_date":"2025-08-31","target_age_min":25,"target_age_max":54,"target_gender":"All","geo_countries":["USA"],"geo_states":[],"geo_cities":[],"geo_zip_codes":[],"inventory":["Hulu"],"screens":["CTV"]}'
 
 # Get campaign by ID (replace with actual ID)
-curl -X GET https://crudcrud.com/api/de2a072c07d24feeb8cc5c4f4268bcf1/campaigns/65a1b2c3d4e5f6g7h8i9j0k1
+curl -X GET https://crudcrud.com/api/7a9ddccaf6e347b7b161e8c1a4d8c394/campaigns/65a1b2c3d4e5f6g7h8i9j0k1
 
 # Update campaign (replace with actual ID)
-curl -X PUT https://crudcrud.com/api/de2a072c07d24feeb8cc5c4f4268bcf1/campaigns/65a1b2c3d4e5f6g7h8i9j0k1 \
+curl -X PUT https://crudcrud.com/api/7a9ddccaf6e347b7b161e8c1a4d8c394/campaigns/65a1b2c3d4e5f6g7h8i9j0k1 \
   -H "Content-Type: application/json" \
   -d '{"user_id":"user_A","campaign_name":"Updated Campaign","budget_goal_usd":15000,"start_date":"2025-06-01","end_date":"2025-09-30","target_age_min":25,"target_age_max":54,"target_gender":"All","geo_countries":["USA"],"geo_states":[],"geo_cities":[],"geo_zip_codes":[],"inventory":["Hulu"],"screens":["CTV"]}'
 
 # Delete campaign (replace with actual ID)
-curl -X DELETE https://crudcrud.com/api/de2a072c07d24feeb8cc5c4f4268bcf1/campaigns/65a1b2c3d4e5f6g7h8i9j0k1
+curl -X DELETE https://crudcrud.com/api/7a9ddccaf6e347b7b161e8c1a4d8c394/campaigns/65a1b2c3d4e5f6g7h8i9j0k1
 ```
 
 ### **Using Postman**
@@ -659,7 +659,7 @@ curl -X DELETE https://crudcrud.com/api/de2a072c07d24feeb8cc5c4f4268bcf1/campaig
 Import this collection to test endpoints:
 
 1. Create a new collection: "JamLoop CMS API"
-2. Set base URL variable: `{{baseUrl}}` = `https://crudcrud.com/api/de2a072c07d24feeb8cc5c4f4268bcf1`
+2. Set base URL variable: `{{baseUrl}}` = `https://crudcrud.com/api/7a9ddccaf6e347b7b161e8c1a4d8c394`
 3. Add requests for each endpoint above
 4. Test data isolation by creating campaigns with different `user_id` values
 
