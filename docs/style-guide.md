@@ -239,7 +239,16 @@ const campaign: Campaign = {
 // For display only
 const displayName = "Campaign Name"; // UI label
 const fieldName = "campaign_name"; // API field
+
+// ❌ Bad - unnecessary transformation
+const transformedCampaign = {
+  userId: campaign.user_id,
+  campaignName: campaign.campaign_name,
+  // ... don't do this
+};
 ```
+
+**Best Practice:** Keep all data in snake_case (API format) throughout the application lifecycle. Only use camelCase for UI-specific state that doesn't map to API fields (e.g., `isLoading`, `hasError`, `showModal`).
 
 ---
 
@@ -393,6 +402,33 @@ const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
 };
 ```
 
+### **7.4 Error Boundaries (Future Enhancement)**
+
+For production, wrap page components in error boundaries to prevent full app crashes:
+
+```typescript
+// app/error.tsx (Next.js 13+ convention)
+'use client';
+
+export default function Error({
+  error,
+  reset,
+}: {
+  error: Error & { digest?: string };
+  reset: () => void;
+}) {
+  return (
+    <div className="flex flex-col items-center justify-center min-h-screen">
+      <h2 className="text-2xl font-bold mb-4">Something went wrong!</h2>
+      <p className="text-muted-foreground mb-4">{error.message}</p>
+      <Button onClick={() => reset()}>Try again</Button>
+    </div>
+  );
+}
+```
+
+**Note:** Error boundaries are not implemented in MVP but should be added for production.
+
 ---
 
 ## **8. API and Data Fetching**
@@ -514,6 +550,14 @@ export function validateAgeRange(min: number, max: number): string | null {
   
   return null;
 }
+
+// Export all validators together for convenience
+export const validators = {
+  validateCampaignName,
+  validateBudget,
+  validateDateRange,
+  validateAgeRange,
+};
 ```
 
 ### **9.2 Form Validation Pattern**
@@ -633,18 +677,24 @@ import './dashboard.css';
 When tests are added, follow these conventions:
 
 - Test files: `ComponentName.test.tsx` or `functionName.test.ts`
-- Test descriptions: Use `describe` and `it` with clear descriptions
+- Use `jest` and `@testing-library/react`
 - Mock external dependencies (API calls, localStorage, etc.)
+- Organize tests: Arrange-Act-Assert (AAA) pattern
 
 ```typescript
 // CampaignForm.test.tsx
 describe('CampaignForm', () => {
   it('should display validation errors for invalid input', () => {
-    // ...
-  });
+    // Arrange
+    const onSubmit = jest.fn();
+    render(<CampaignForm onSubmit={onSubmit} isLoading={false} />);
 
-  it('should submit form with valid data', async () => {
-    // ...
+    // Act
+    fireEvent.click(screen.getByText('Submit'));
+
+    // Assert
+    expect(await screen.findByText('Campaign name is required')).toBeInTheDocument();
+    expect(onSubmit).not.toHaveBeenCalled();
   });
 });
 ```
@@ -655,33 +705,19 @@ describe('CampaignForm', () => {
 
 Use clear, descriptive commit messages:
 
+- **Format:** `<type>: <description>`
+- **Types:** feat, fix, refactor, docs, style, test, chore
+
 ```bash
 # ✅ Good
-git commit -m "Add campaign creation form with validation"
-git commit -m "Fix date range validation for end date"
-git commit -m "Refactor API client to use environment variables"
+git commit -m "feat: Add campaign creation form with validation"
+git commit -m "fix: Resolve user_id injection issue in create campaign"
+git commit -m "refactor: Extract validation logic into separate utility"
 
 # ❌ Bad
 git commit -m "update"
-git commit -m "fix bug"
 git commit -m "wip"
-```
-
-**Commit message format:**
-```
-<type>: <description>
-
-[optional body]
-
-Types: feat, fix, refactor, docs, style, test, chore
-```
-
-Examples:
-```
-feat: Add delete confirmation dialog to campaign table
-fix: Resolve user_id injection issue in create campaign
-refactor: Extract validation logic into separate utility
-docs: Update API documentation with error codes
+git commit -m "fix bug"
 ```
 
 ---
@@ -690,12 +726,12 @@ docs: Update API documentation with error codes
 
 - Use Tailwind utility classes for styling
 - Extract repeated patterns into components
+- Prefer `className` prop over inline styles
 - Use `cn()` utility for conditional classes
 
 ```typescript
 import { cn } from '@/lib/utils';
 
-// ✅ Good
 <button
   className={cn(
     "px-4 py-2 rounded-md font-medium",
@@ -704,11 +740,6 @@ import { cn } from '@/lib/utils';
     variant === "secondary" && "bg-gray-200 text-gray-900"
   )}
 >
-  Submit
-</button>
-
-// ❌ Bad - inline styles
-<button style={{ padding: '8px 16px', background: isLoading ? '#ccc' : '#0066ff' }}>
   Submit
 </button>
 ```
@@ -723,8 +754,10 @@ import { cn } from '@/lib/utils';
 
 ```env
 # .env.local
-NEXT_PUBLIC_CRUDCRUD_ENDPOINT=https://crudcrud.com/api/7a9ddccaf6e347b7b161e8c1a4d8c394
+NEXT_PUBLIC_CRUDCRUD_ENDPOINT=<your-crudcrud-endpoint>
 ```
+
+**Note:** See the main README.md for the current endpoint URL and setup instructions.
 
 ```typescript
 // Access in code
@@ -737,15 +770,14 @@ const apiUrl = process.env.NEXT_PUBLIC_CRUDCRUD_ENDPOINT;
 
 | Convention | Rule | Example |
 |------------|------|---------|
-| **Files** | PascalCase for components | `CampaignForm.tsx` |
-| **Variables** | camelCase | `userId`, `isLoading` |
-| **Constants** | UPPER_SNAKE_CASE | `API_BASE_URL` |
-| **Types/Interfaces** | PascalCase | `Campaign`, `CampaignFormProps` |
-| **API Fields** | snake_case | `user_id`, `campaign_name` |
-| **Functions** | camelCase, verb-based | `getCampaigns()`, `handleSubmit()` |
 | **Components** | PascalCase | `CampaignForm`, `LoginPage` |
 | **Event Handlers** | `handle` prefix | `handleClick()`, `handleSubmit()` |
 | **Boolean Variables** | `is/has/should` prefix | `isLoading`, `hasError` |
+| **API Fields** | snake_case | `user_id`, `campaign_name` |
+| **Types/Interfaces** | PascalCase | `Campaign`, `CampaignFormProps` |
+| **Constants** | UPPER_SNAKE_CASE | `API_BASE_URL` |
+| **Variables** | camelCase | `userId`, `isLoading` |
+| **Files** | PascalCase for components | `CampaignForm.tsx` |
 
 ---
 

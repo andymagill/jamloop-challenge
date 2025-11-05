@@ -235,7 +235,7 @@ export default function EditCampaignPage({ params }: { params: { id: string } })
       const data = await getCampaignById(params.id);
       const userId = getActiveUserId();
       
-      // Security check
+      // Security check - CRITICAL: Verify ownership before allowing edit
       if (data.user_id !== userId) {
         toast.error('Unauthorized access');
         router.push('/dashboard');
@@ -256,10 +256,10 @@ export default function EditCampaignPage({ params }: { params: { id: string } })
       setIsSubmitting(true);
       const userId = getActiveUserId();
       
-      // Ensure user_id is preserved
+      // CRITICAL: Ensure user_id is preserved and matches current user
       const updatedData = {
         ...data,
-        user_id: userId
+        user_id: userId // Override to prevent tampering
       };
       
       await updateCampaign(params.id, updatedData);
@@ -273,7 +273,21 @@ export default function EditCampaignPage({ params }: { params: { id: string } })
   };
 
   const handleDelete = async () => {
-    // Delete with confirmation dialog
+    try {
+      const userId = getActiveUserId();
+      
+      // Security check before deletion
+      if (campaign?.user_id !== userId) {
+        toast.error('Unauthorized action');
+        return;
+      }
+      
+      await deleteCampaign(params.id);
+      toast.success('Campaign deleted successfully!');
+      router.push('/dashboard');
+    } catch (error) {
+      toast.error('Failed to delete campaign');
+    }
   };
 
   if (isLoading) {
@@ -305,6 +319,12 @@ export default function EditCampaignPage({ params }: { params: { id: string } })
 - Verify user ownership (security check)
 - Handle update submission
 - Coordinate delete operation
+
+**Security Pattern Summary:**
+1. **READ (GET):** Fetch data → Verify `data.user_id === getActiveUserId()` → Redirect if unauthorized
+2. **CREATE (POST):** Inject `user_id: getActiveUserId()` before submission
+3. **UPDATE (PUT):** Verify ownership on load → Inject `user_id: getActiveUserId()` before submission
+4. **DELETE:** Verify `campaign.user_id === getActiveUserId()` before calling API
 
 ---
 

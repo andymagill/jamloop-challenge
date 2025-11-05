@@ -8,17 +8,23 @@ This document provides complete REST endpoint specifications for the JamLoop Cam
 
 ### **Environment Variables**
 
+The API base URL is configured via environment variable:
+
 ```env
-NEXT_PUBLIC_CRUDCRUD_ENDPOINT=https://crudcrud.com/api/7a9ddccaf6e347b7b161e8c1a4d8c394
+NEXT_PUBLIC_CRUDCRUD_ENDPOINT=<your-crudcrud-endpoint>
 ```
+
+See the main README.md for setup instructions and the current endpoint URL.
 
 ### **Base URL**
 
 ```
-https://crudcrud.com/api/7a9ddccaf6e347b7b161e8c1a4d8c394
+{NEXT_PUBLIC_CRUDCRUD_ENDPOINT}
 ```
 
 All campaign endpoints are prefixed with `/campaigns`.
+
+**Example:** If your endpoint is `https://crudcrud.com/api/abc123`, then campaigns are accessed at `https://crudcrud.com/api/abc123/campaigns`.
 
 ---
 
@@ -49,8 +55,8 @@ interface Campaign {
   user_id: string;                // "user_A" or "user_B"
   campaign_name: string;          // Min 3 characters
   budget_goal_usd: number;        // Must be > 0
-  start_date: string;             // ISO 8601 date (YYYY-MM-DD)
-  end_date: string;               // ISO 8601 date (YYYY-MM-DD)
+  start_date: string;             // ISO 8601 date format: "YYYY-MM-DD" (e.g., "2025-06-01")
+  end_date: string;               // ISO 8601 date format: "YYYY-MM-DD" (e.g., "2025-08-31")
   target_age_min: number;         // 18-99
   target_age_max: number;         // 18-99
   target_gender: string;          // "Male" | "Female" | "All"
@@ -100,7 +106,7 @@ GET /campaigns
 
 **Request:**
 ```bash
-curl -X GET https://crudcrud.com/api/7a9ddccaf6e347b7b161e8c1a4d8c394/campaigns
+curl -X GET ${NEXT_PUBLIC_CRUDCRUD_ENDPOINT}/campaigns
 ```
 
 **Response: 200 OK**
@@ -170,7 +176,7 @@ GET /campaigns/:id
 
 **Request:**
 ```bash
-curl -X GET https://crudcrud.com/api/7a9ddccaf6e347b7b161e8c1a4d8c394/campaigns/65a1b2c3d4e5f6g7h8i9j0k1
+curl -X GET ${NEXT_PUBLIC_CRUDCRUD_ENDPOINT}/campaigns/65a1b2c3d4e5f6g7h8i9j0k1
 ```
 
 **Response: 200 OK**
@@ -250,7 +256,7 @@ Content-Type: application/json
 
 **Request Example:**
 ```bash
-curl -X POST https://crudcrud.com/api/7a9ddccaf6e347b7b161e8c1a4d8c394/campaigns \
+curl -X POST ${NEXT_PUBLIC_CRUDCRUD_ENDPOINT}/campaigns \
   -H "Content-Type: application/json" \
   -d '{
     "user_id": "user_A",
@@ -350,7 +356,7 @@ Content-Type: application/json
 
 **Request Example:**
 ```bash
-curl -X PUT https://crudcrud.com/api/7a9ddccaf6e347b7b161e8c1a4d8c394/campaigns/65a1b2c3d4e5f6g7h8i9j0k1 \
+curl -X PUT ${NEXT_PUBLIC_CRUDCRUD_ENDPOINT}/campaigns/65a1b2c3d4e5f6g7h8i9j0k1 \
   -H "Content-Type: application/json" \
   -d '{
     "user_id": "user_A",
@@ -430,7 +436,7 @@ DELETE /campaigns/:id
 
 **Request:**
 ```bash
-curl -X DELETE https://crudcrud.com/api/7a9ddccaf6e347b7b161e8c1a4d8c394/campaigns/65a1b2c3d4e5f6g7h8i9j0k1
+curl -X DELETE ${NEXT_PUBLIC_CRUDCRUD_ENDPOINT}/campaigns/65a1b2c3d4e5f6g7h8i9j0k1
 ```
 
 **Response: 200 OK**
@@ -451,6 +457,25 @@ if (campaign.user_id !== userId) {
 }
 
 await deleteCampaign(id);
+```
+
+**Edge Case: Campaign Not Found**
+
+If a campaign ID doesn't exist (was already deleted or never existed), the API returns 404:
+
+```typescript
+// Handling 404 during delete
+try {
+  await deleteCampaign(id);
+  toast.success('Campaign deleted successfully');
+} catch (error) {
+  if (error.message.includes('not found')) {
+    toast.error('Campaign no longer exists');
+  } else {
+    toast.error('Failed to delete campaign');
+  }
+  router.push('/dashboard');
+}
 ```
 
 **Error Response: 404 Not Found**
@@ -633,25 +658,27 @@ You **do not** need to generate IDs client-side.
 
 ### **Using curl**
 
+**Note:** Replace `${NEXT_PUBLIC_CRUDCRUD_ENDPOINT}` with your actual endpoint URL from `.env.local`.
+
 ```bash
 # Get all campaigns
-curl -X GET https://crudcrud.com/api/7a9ddccaf6e347b7b161e8c1a4d8c394/campaigns
+curl -X GET ${NEXT_PUBLIC_CRUDCRUD_ENDPOINT}/campaigns
 
 # Create a campaign
-curl -X POST https://crudcrud.com/api/7a9ddccaf6e347b7b161e8c1a4d8c394/campaigns \
+curl -X POST ${NEXT_PUBLIC_CRUDCRUD_ENDPOINT}/campaigns \
   -H "Content-Type: application/json" \
   -d '{"user_id":"user_A","campaign_name":"Test Campaign","budget_goal_usd":10000,"start_date":"2025-06-01","end_date":"2025-08-31","target_age_min":25,"target_age_max":54,"target_gender":"All","geo_countries":["USA"],"geo_states":[],"geo_cities":[],"geo_zip_codes":[],"inventory":["Hulu"],"screens":["CTV"]}'
 
 # Get campaign by ID (replace with actual ID)
-curl -X GET https://crudcrud.com/api/7a9ddccaf6e347b7b161e8c1a4d8c394/campaigns/65a1b2c3d4e5f6g7h8i9j0k1
+curl -X GET ${NEXT_PUBLIC_CRUDCRUD_ENDPOINT}/campaigns/65a1b2c3d4e5f6g7h8i9j0k1
 
 # Update campaign (replace with actual ID)
-curl -X PUT https://crudcrud.com/api/7a9ddccaf6e347b7b161e8c1a4d8c394/campaigns/65a1b2c3d4e5f6g7h8i9j0k1 \
+curl -X PUT ${NEXT_PUBLIC_CRUDCRUD_ENDPOINT}/campaigns/65a1b2c3d4e5f6g7h8i9j0k1 \
   -H "Content-Type: application/json" \
   -d '{"user_id":"user_A","campaign_name":"Updated Campaign","budget_goal_usd":15000,"start_date":"2025-06-01","end_date":"2025-09-30","target_age_min":25,"target_age_max":54,"target_gender":"All","geo_countries":["USA"],"geo_states":[],"geo_cities":[],"geo_zip_codes":[],"inventory":["Hulu"],"screens":["CTV"]}'
 
 # Delete campaign (replace with actual ID)
-curl -X DELETE https://crudcrud.com/api/7a9ddccaf6e347b7b161e8c1a4d8c394/campaigns/65a1b2c3d4e5f6g7h8i9j0k1
+curl -X DELETE ${NEXT_PUBLIC_CRUDCRUD_ENDPOINT}/campaigns/65a1b2c3d4e5f6g7h8i9j0k1
 ```
 
 ### **Using Postman**
@@ -659,7 +686,7 @@ curl -X DELETE https://crudcrud.com/api/7a9ddccaf6e347b7b161e8c1a4d8c394/campaig
 Import this collection to test endpoints:
 
 1. Create a new collection: "JamLoop CMS API"
-2. Set base URL variable: `{{baseUrl}}` = `https://crudcrud.com/api/7a9ddccaf6e347b7b161e8c1a4d8c394`
+2. Set base URL variable: `{{baseUrl}}` = `<your-crudcrud-endpoint>` (from your `.env.local` file)
 3. Add requests for each endpoint above
 4. Test data isolation by creating campaigns with different `user_id` values
 
