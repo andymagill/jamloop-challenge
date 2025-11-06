@@ -22,17 +22,15 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 const AUTH_STORAGE_KEY = 'jamloop_auth_user';
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [userId, setUserId] = useState<UserId | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-
-  // Load auth state from localStorage on mount
-  useEffect(() => {
+  const [userId, setUserId] = useState<UserId | null>(() => {
+    if (typeof window === 'undefined') return null;
     const storedUserId = localStorage.getItem(AUTH_STORAGE_KEY);
     if (storedUserId && (storedUserId === 'user_A' || storedUserId === 'user_B')) {
-      setUserId(storedUserId as UserId);
+      return storedUserId as UserId;
     }
-    setIsLoading(false);
-  }, []);
+    return null;
+  });
+  const [isLoading, setIsLoading] = useState(false);
 
   const login = (username: string, password: string): boolean => {
     // Check if credentials match
@@ -49,11 +47,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUserId(null);
     localStorage.removeItem(AUTH_STORAGE_KEY);
   };
-
-  // Don't render children until we've checked localStorage
-  if (isLoading) {
-    return null;
-  }
 
   return (
     <AuthContext.Provider
