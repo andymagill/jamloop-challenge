@@ -1,11 +1,14 @@
 'use client';
 
 import ProtectedRoute from '@/components/ProtectedRoute';
+import Header from '@/components/layout/Header';
+import CampaignTable from '@/components/campaigns/CampaignTable';
 import { useAuth } from '@/lib/auth/AuthContext';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { Campaign, getAllCampaigns } from '@/lib/api/client';
-import { initializeResourceId, getResourceIdInfo } from '@/lib/api/resourceManager';
+import { Campaign, getAllCampaigns, deleteCampaign } from '@/lib/api/client';
+import { initializeResourceId } from '@/lib/api/resourceManager';
+import { toast } from 'sonner';
 
 export default function DashboardPage() {
   const { userId, logout } = useAuth();
@@ -69,46 +72,29 @@ export default function DashboardPage() {
     router.push('/dashboard/new');
   };
 
-  const handleRowClick = (campaignId: string) => {
+  const handleEdit = (campaignId: string) => {
     router.push(`/dashboard/edit/${campaignId}`);
   };
 
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-    }).format(amount);
-  };
+  const handleDelete = async (campaignId: string) => {
+    if (!confirm('Are you sure you want to delete this campaign?')) {
+      return;
+    }
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-    });
+    try {
+      await deleteCampaign(campaignId);
+      setCampaigns(campaigns.filter((c) => c._id !== campaignId));
+      toast.success('Campaign deleted successfully');
+    } catch (err) {
+      console.error('Error deleting campaign:', err);
+      toast.error('Failed to delete campaign');
+    }
   };
 
   return (
     <ProtectedRoute>
       <div className="min-h-screen bg-gray-50">
-        <header className="bg-white shadow">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-            <h1 className="text-2xl font-bold text-gray-900">
-              JamLoop CMS - Dashboard
-            </h1>
-            <div className="flex items-center gap-4">
-              <span className="text-sm text-gray-600">
-                Logged in as: <strong>{userId}</strong>
-              </span>
-              <button
-                onClick={handleLogout}
-                className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
-              >
-                Logout
-              </button>
-            </div>
-          </div>
-        </header>
+        <Header userId={userId || ''} onLogout={handleLogout} />
 
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="bg-white shadow rounded-lg p-6">
@@ -139,81 +125,13 @@ export default function DashboardPage() {
               </div>
             )}
 
-            {!loading && !error && campaigns.length === 0 && (
-              <div className="text-center py-8">
-                <p className="text-gray-600 mb-4">
-                  No campaigns found. Create your first campaign to get started!
-                </p>
-              </div>
-            )}
-
-            {!loading && !error && campaigns.length > 0 && (
-              <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Campaign Name
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Budget
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Start Date
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        End Date
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Target Gender
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Screens
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
-                    {campaigns.map((campaign) => (
-                      <tr
-                        key={campaign._id}
-                        onClick={() => handleRowClick(campaign._id!)}
-                        className="hover:bg-gray-50 cursor-pointer transition-colors"
-                      >
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm font-medium text-gray-900">
-                            {campaign.name}
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900">
-                            {formatCurrency(campaign.budget_goal_usd)}
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900">
-                            {formatDate(campaign.start_date)}
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900">
-                            {formatDate(campaign.end_date)}
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900">
-                            {campaign.target_gender}
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900">
-                            {campaign.screens.join(', ')}
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+            {!loading && !error && (
+              <CampaignTable
+                campaigns={campaigns}
+                onEdit={handleEdit}
+                onDelete={handleDelete}
+                onCreateNew={handleCreateNew}
+              />
             )}
           </div>
         </main>
