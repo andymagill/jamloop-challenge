@@ -63,7 +63,7 @@ The system will:
 
 If you want to manually clear the cached resource ID, you can:
 - Open browser DevTools → Application → Local Storage
-- Delete `crudcrud_resource_id` and `crudcrud_resource_timestamp`
+- Delete `crudcrud_resource_id`
 
 4. Run the development server:
 ```bash
@@ -118,9 +118,9 @@ The application automatically handles CrudCrud's 24-hour resource ID expiration:
 ### How It Works
 
 1. **Automatic Fetching**: On first login, the system fetches a fresh resource ID from CrudCrud
-2. **Local Caching**: Resource ID is stored in localStorage with a timestamp
-3. **Expiration Tracking**: System checks if the resource ID is older than 24 hours
-4. **Auto-Refresh**: Expired resource IDs are automatically replaced with new ones
+2. **Local Caching**: Resource ID is stored in localStorage
+3. **Endpoint Validation**: System validates resource IDs by testing against the API endpoint
+4. **Auto-Refresh**: Invalid or expired resource IDs are automatically replaced with new ones
 5. **Retry Logic**: API errors due to expired resources trigger automatic renewal
 
 ### Implementation Details
@@ -128,8 +128,7 @@ The application automatically handles CrudCrud's 24-hour resource ID expiration:
 - **Resource Manager**: `lib/api/resourceManager.ts` handles all resource ID operations
 - **Storage Keys**: 
   - `crudcrud_resource_id` - The current resource ID
-  - `crudcrud_resource_timestamp` - When it was created
-- **Expiration**: 24 hours from creation time
+- **Expiration**: Resource IDs are validated by testing against the endpoint
 - **Persistence**: Resource IDs are kept across sessions (even after logout) if not expired
 
 ### Manual Management (Advanced)
@@ -140,14 +139,12 @@ If needed, you can manually manage resource IDs:
 ```javascript
 // In browser console
 localStorage.getItem('crudcrud_resource_id')
-localStorage.getItem('crudcrud_resource_timestamp')
 ```
 
 **Clear cached resource ID:**
 ```javascript
 // In browser console
 localStorage.removeItem('crudcrud_resource_id')
-localStorage.removeItem('crudcrud_resource_timestamp')
 // Or use DevTools → Application → Local Storage
 ```
 
