@@ -2,40 +2,13 @@
 
 import { useState, FormEvent, ChangeEvent } from 'react';
 import { Campaign } from '@/lib/api/client';
+import { INVENTORY_OPTIONS, SCREEN_OPTIONS, COUNTRY_OPTIONS } from '@/lib/constants/campaign';
 
 interface CampaignFormProps {
   campaign?: Campaign;
   onSubmit: (data: Omit<Campaign, '_id' | 'user_id'>) => Promise<void>;
   isLoading?: boolean;
 }
-
-// Options for multi-select fields
-const INVENTORY_OPTIONS = [
-  'Hulu',
-  'Discovery',
-  'ABC',
-  'A&E',
-  'TLC',
-  'Fox News',
-  'Fox Sports'
-];
-
-const SCREEN_OPTIONS = [
-  'CTV',
-  'Mobile Device',
-  'Web Browser'
-];
-
-const COUNTRY_OPTIONS = [
-  'United States',
-  'Canada',
-  'United Kingdom',
-  'Australia',
-  'Germany',
-  'France',
-  'Japan',
-  'Mexico'
-];
 
 export default function CampaignForm({ campaign, onSubmit, isLoading = false }: CampaignFormProps) {
   const [errors, setErrors] = useState<Record<string, string>>({});
