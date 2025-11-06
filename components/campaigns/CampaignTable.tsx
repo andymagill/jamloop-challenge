@@ -1,6 +1,7 @@
 'use client';
 
 import { Campaign } from '@/lib/api/client';
+import { Button } from '@/components/ui/button';
 
 interface CampaignTableProps {
   campaigns: Campaign[];
@@ -52,27 +53,6 @@ export default function CampaignTable({
         <p className="mt-1 text-sm text-gray-500">
           Get started by creating a new campaign.
         </p>
-        <div className="mt-6">
-          <button
-            onClick={onCreateNew}
-            className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-          >
-            <svg
-              className="-ml-1 mr-2 h-5 w-5"
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-              aria-hidden="true"
-            >
-              <path
-                fillRule="evenodd"
-                d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
-                clipRule="evenodd"
-              />
-            </svg>
-            Create New Campaign
-          </button>
-        </div>
       </div>
     );
   }
@@ -110,9 +90,12 @@ export default function CampaignTable({
               className="hover:bg-gray-50 transition-colors"
             >
               <td className="px-6 py-4 whitespace-nowrap">
-                <div className="text-sm font-medium text-gray-900">
+                <button
+                  onClick={() => onEdit(campaign._id!)}
+                  className="text-sm font-medium text-blue-600 hover:text-blue-900 hover:underline cursor-pointer text-left"
+                >
                   {campaign.name}
-                </div>
+                </button>
               </td>
               <td className="px-6 py-4 whitespace-nowrap">
                 <div className="text-sm text-gray-900">
@@ -135,18 +118,22 @@ export default function CampaignTable({
                 </div>
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-                <button
+                <Button
                   onClick={() => onEdit(campaign._id!)}
+                  variant="ghost"
+                  size="sm"
                   className="text-blue-600 hover:text-blue-900"
                 >
                   Edit
-                </button>
-                <button
+                </Button>
+                <Button
                   onClick={() => onDelete(campaign._id!)}
+                  variant="ghost"
+                  size="sm"
                   className="text-red-600 hover:text-red-900"
                 >
                   Delete
-                </button>
+                </Button>
               </td>
             </tr>
           ))}

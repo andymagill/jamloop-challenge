@@ -9,6 +9,7 @@ import { useEffect, useState } from 'react';
 import { Campaign, getAllCampaigns, deleteCampaign } from '@/lib/api/client';
 import { initializeResourceId } from '@/lib/api/resourceManager';
 import { toast } from 'sonner';
+import { Button } from '@/components/ui/button';
 
 export default function DashboardPage() {
   const { userId, logout } = useAuth();
@@ -102,12 +103,11 @@ export default function DashboardPage() {
               <h2 className="text-xl font-semibold text-gray-900">
                 My Campaigns
               </h2>
-              <button
+              <Button
                 onClick={handleCreateNew}
-                className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
               >
                 Create New Campaign
-              </button>
+              </Button>
             </div>
 
             {loading && (

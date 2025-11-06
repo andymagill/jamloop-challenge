@@ -1,5 +1,7 @@
 'use client';
 
+import { Button } from '@/components/ui/button';
+
 interface HeaderProps {
   userId: string;
   onLogout: () => void;
@@ -16,12 +18,13 @@ export default function Header({ userId, onLogout }: HeaderProps) {
           <span className="text-sm text-gray-600">
             Logged in as: <strong>{userId}</strong>
           </span>
-          <button
+          <Button
             onClick={onLogout}
-            className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+            variant="destructive"
+            size="sm"
           >
             Logout
-          </button>
+          </Button>
         </div>
       </div>
     </header>
