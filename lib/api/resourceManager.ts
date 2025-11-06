@@ -60,27 +60,39 @@ async function testResourceId(resourceId: string): Promise<boolean> {
       },
     });
 
-    // 400 = expired (CORS error), 404/410 = not found/gone
-    if (response.status === 400 || response.status === 404 || response.status === 410) {
+    // 404/410 = not found/gone (truly expired)
+    // Note: 400 can occur for various reasons, not just expiry
+    if (response.status === 404 || response.status === 410) {
       console.log(`❌ Resource ID ${resourceId} is expired or invalid (status: ${response.status})`);
       return false;
     }
 
-    if (response.ok || response.status === 200) {
+    // Any successful response (200-299) means the resource is valid
+    if (response.ok) {
       console.log(`✓ Resource ID ${resourceId} is valid`);
       return true;
     }
 
-    // For other statuses (500, etc), assume the resource might be valid
-    // but CrudCrud is having issues
-    console.warn(`⚠️ Unexpected status ${response.status} when testing resource ID`);
+    // For client errors (400, 401, 403) or server errors (500+), 
+    // we should be more conservative and assume the resource might still be valid
+    // These could be temporary issues, not necessarily expired resources
+    console.warn(`⚠️ Unexpected status ${response.status} when testing resource ID - assuming valid`);
     return true;
   } catch (error) {
-    // CORS errors or network failures often indicate expired resource
-    // This is expected behavior, so we handle it silently without console.error
-    // Check if it's a CORS/fetch error which typically means expired
+    // Network failures can happen for various reasons
+    // Only treat it as expired if we can confirm it's a CORS error (which is rare in modern browsers)
+    // For most errors, we should be conservative and assume the resource is still valid
+    if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
+      // Failed to fetch usually means CORS or network issue
+      // Log it but don't automatically assume expired - could be temporary network issue
+      console.warn(`⚠️ Network error when testing resource ID ${resourceId}: ${error.message}`);
+      console.warn(`This could be a temporary network issue. If problems persist, the resource may be expired.`);
+      // Return true to avoid false positives - let the actual API call fail if truly expired
+      return true;
+    }
+    
     if (error instanceof TypeError) {
-      console.log(`❌ Resource ID ${resourceId} appears expired (CORS/network error)`);
+      console.log(`❌ Resource ID ${resourceId} appears expired (CORS error)`);
       return false;
     }
     
