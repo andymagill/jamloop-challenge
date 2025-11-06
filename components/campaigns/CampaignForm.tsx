@@ -3,6 +3,7 @@
 import { useState, FormEvent, ChangeEvent } from 'react';
 import { Campaign } from '@/lib/api/client';
 import { INVENTORY_OPTIONS, SCREEN_OPTIONS, COUNTRY_OPTIONS } from '@/lib/constants/campaign';
+import { Button } from '@/components/ui/button';
 
 interface CampaignFormProps {
   campaign?: Campaign;
@@ -505,13 +506,13 @@ export default function CampaignForm({ campaign, onSubmit, isLoading = false }: 
 
       {/* Submit Button */}
       <div className="flex justify-end gap-4">
-        <button
+        <Button
           type="submit"
           disabled={isLoading}
-          className="px-6 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+          variant="default"
         >
           {isLoading ? 'Saving...' : campaign ? 'Update Campaign' : 'Create Campaign'}
-        </button>
+        </Button>
       </div>
     </form>
   );

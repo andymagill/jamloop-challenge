@@ -120,17 +120,15 @@ export default function CampaignTable({
               <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
                 <Button
                   onClick={() => onEdit(campaign._id!)}
-                  variant="ghost"
+                  variant="default"
                   size="sm"
-                  className="text-blue-600 hover:text-blue-900"
                 >
                   Edit
                 </Button>
                 <Button
                   onClick={() => onDelete(campaign._id!)}
-                  variant="ghost"
+                  variant="destructive"
                   size="sm"
-                  className="text-red-600 hover:text-red-900"
                 >
                   Delete
                 </Button>

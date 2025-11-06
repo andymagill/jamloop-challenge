@@ -105,6 +105,7 @@ export default function DashboardPage() {
               </h2>
               <Button
                 onClick={handleCreateNew}
+                variant="default"
               >
                 Create New Campaign
               </Button>
