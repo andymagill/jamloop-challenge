@@ -74,8 +74,8 @@ async function apiRequest<T>(
       throw new Error(`API request failed: ${response.status} ${response.statusText} - ${errorText}`);
     }
 
-    // DELETE requests typically return no content
-    if (response.status === 204 || options?.method === 'DELETE') {
+    // DELETE and PUT requests typically return no content
+    if (response.status === 204 || options?.method === 'DELETE' || options?.method === 'PUT') {
       return {} as T;
     }
 
