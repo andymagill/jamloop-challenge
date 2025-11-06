@@ -2,6 +2,17 @@
 
 import { Campaign } from '@/lib/api/client';
 import { Button } from '@/components/ui/button';
+import { useState } from 'react';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 interface CampaignTableProps {
   campaigns: Campaign[];
@@ -16,6 +27,10 @@ export default function CampaignTable({
   onDelete,
   onCreateNew,
 }: CampaignTableProps) {
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [campaignToDelete, setCampaignToDelete] = useState<string | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
@@ -29,6 +44,26 @@ export default function CampaignTable({
       month: 'short',
       day: 'numeric',
     });
+  };
+
+  const handleDeleteClick = (campaignId: string) => {
+    setCampaignToDelete(campaignId);
+    setShowDeleteDialog(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!campaignToDelete) return;
+
+    setIsDeleting(true);
+    try {
+      await onDelete(campaignToDelete);
+      setShowDeleteDialog(false);
+      setCampaignToDelete(null);
+    } catch (error) {
+      console.error('Error deleting campaign:', error);
+    } finally {
+      setIsDeleting(false);
+    }
   };
 
   // Empty state
@@ -126,7 +161,7 @@ export default function CampaignTable({
                   Edit
                 </Button>
                 <Button
-                  onClick={() => onDelete(campaign._id!)}
+                  onClick={() => handleDeleteClick(campaign._id!)}
                   variant="destructive"
                   size="sm"
                 >
@@ -137,6 +172,27 @@ export default function CampaignTable({
           ))}
         </tbody>
       </table>
+
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Campaign</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this campaign? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteConfirm}
+              disabled={isDeleting}
+              className="bg-red-600 hover:bg-red-700 focus:ring-red-600"
+            >
+              {isDeleting ? 'Deleting...' : 'Delete'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

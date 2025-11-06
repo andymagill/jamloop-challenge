@@ -78,10 +78,6 @@ export default function DashboardPage() {
   };
 
   const handleDelete = async (campaignId: string) => {
-    if (!confirm('Are you sure you want to delete this campaign?')) {
-      return;
-    }
-
     try {
       await deleteCampaign(campaignId);
       setCampaigns(campaigns.filter((c) => c._id !== campaignId));
