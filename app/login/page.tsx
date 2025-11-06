@@ -2,14 +2,21 @@
 
 import { useAuth } from '@/lib/auth/AuthContext';
 import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 import LoginForm from '@/components/auth/LoginForm';
 
 export default function LoginPage() {
   const router = useRouter();
+  const { isAuthenticated } = useAuth();
 
-  const handleLogin = (userId: string) => {
-    // LoginForm has already validated credentials, so just store the userId
-    localStorage.setItem('jamloop_auth_user', userId);
+  useEffect(() => {
+    if (isAuthenticated) {
+      router.push('/dashboard');
+    }
+  }, [isAuthenticated, router]);
+
+  const handleLogin = async (userId: string) => {
+    // After successful login, redirect to dashboard
     router.push('/dashboard');
   };
 

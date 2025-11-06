@@ -6,25 +6,34 @@ This document provides complete REST endpoint specifications for the JamLoop Cam
 
 ## **Base Configuration**
 
-### **Environment Variables**
+### **Dynamic Resource ID Management**
 
-The API base URL is configured via environment variable:
+The application automatically manages CrudCrud resource IDs:
 
-```env
-NEXT_PUBLIC_CRUDCRUD_ENDPOINT=<your-crudcrud-endpoint>
-```
+- **Automatic Validation**: Resource ID is tested against the CrudCrud API when dashboard loads
+- **Local Storage**: Valid resource IDs are cached in `localStorage`
+- **Auto-Refresh**: If API returns 404/410 (expired), a new resource ID is automatically fetched
+- **Retry Logic**: Failed requests due to expired resources trigger automatic resource ID renewal
 
-See the main README.md for setup instructions and the current endpoint URL.
+**Implementation Details:**
+- Resource ID is stored as: `crudcrud_resource_id`
+- Validation happens on dashboard page load
+- No timestamp tracking - relies on API response to determine expiration
+- Auto-retry on 404/410 errors in API client
 
 ### **Base URL**
 
+The base URL is dynamically constructed as:
+
 ```
-{NEXT_PUBLIC_CRUDCRUD_ENDPOINT}
+https://crudcrud.com/api/{dynamically-fetched-resource-id}
 ```
 
 All campaign endpoints are prefixed with `/campaigns`.
 
-**Example:** If your endpoint is `https://crudcrud.com/api/abc123`, then campaigns are accessed at `https://crudcrud.com/api/abc123/campaigns`.
+**Example:** `https://crudcrud.com/api/abc123/campaigns`
+
+**Note:** The resource ID changes every 24 hours. The system handles this automatically - no manual intervention required.
 
 ---
 
@@ -40,6 +49,14 @@ This PoC uses **simulated authentication** with hardcoded credentials:
 | `user_B` | `password_B` | `user_B` |
 
 The active `user_id` is stored in `localStorage` and automatically injected into all write operations.
+
+**Resource ID Initialization:**
+After successful login and navigating to the dashboard, the system automatically:
+1. Checks for an existing resource ID in localStorage
+2. Tests the resource ID against the CrudCrud API (/campaigns endpoint)
+3. If valid (200 response), uses the cached resource ID
+4. If expired (404/410 response), fetches a new resource ID from CrudCrud homepage
+5. Stores the valid resource ID for future use
 
 **Note**: Production systems require server-side authentication with proper token management.
 

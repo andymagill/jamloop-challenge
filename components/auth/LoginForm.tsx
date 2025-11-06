@@ -1,34 +1,33 @@
 'use client';
 
 import { useState, FormEvent } from 'react';
+import { useAuth } from '@/lib/auth/AuthContext';
 
 interface LoginFormProps {
   onLogin: (userId: string) => void;
 }
 
-// Hardcoded credentials
-const VALID_CREDENTIALS = {
-  user_A: 'password_A',
-  user_B: 'password_B',
-} as const;
-
 export default function LoginForm({ onLogin }: LoginFormProps) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const { login, isLoading } = useAuth();
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setError('');
 
-    // Validate credentials
-    if (
-      username in VALID_CREDENTIALS &&
-      VALID_CREDENTIALS[username as keyof typeof VALID_CREDENTIALS] === password
-    ) {
-      onLogin(username);
-    } else {
-      setError('Invalid username or password');
+    try {
+      const success = await login(username, password);
+      
+      if (success) {
+        onLogin(username);
+      } else {
+        setError('Invalid username or password');
+      }
+    } catch (err) {
+      setError('An error occurred during login. Please try again.');
+      console.error('Login error:', err);
     }
   };
 
@@ -93,9 +92,10 @@ export default function LoginForm({ onLogin }: LoginFormProps) {
         <div>
           <button
             type="submit"
-            className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            disabled={isLoading}
+            className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:bg-blue-400 disabled:cursor-not-allowed"
           >
-            Sign in
+            {isLoading ? 'Signing in...' : 'Sign in'}
           </button>
         </div>
       </form>

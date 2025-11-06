@@ -51,14 +51,19 @@ pnpm install
 bun install
 ```
 
-3. Set up environment variables:
+3. Set up environment (Optional):
 
-Create a `.env.local` file in the root directory:
-```env
-NEXT_PUBLIC_CRUDCRUD_ENDPOINT=https://crudcrud.com/api/7a9ddccaf6e347b7b161e8c1a4d8c394
-```
+**Note**: The application now automatically manages CrudCrud resource IDs. No manual configuration is needed!
 
-**Note**: CrudCrud.com resource IDs expire after 24 hours. If you encounter API errors, you'll need to generate a new resource ID (see [Updating CrudCrud Resource ID](#updating-crudcrud-resource-id) below).
+The system will:
+- Automatically fetch a new resource ID after login
+- Store it in browser localStorage with expiration tracking
+- Auto-refresh when the 24-hour expiration period passes
+- Handle expired resources seamlessly with retry logic
+
+If you want to manually clear the cached resource ID, you can:
+- Open browser DevTools → Application → Local Storage
+- Delete `crudcrud_resource_id` and `crudcrud_resource_timestamp`
 
 4. Run the development server:
 ```bash
@@ -101,51 +106,75 @@ jamloop-cms/
 ## Documentation
 
 - **[Complete Requirements & Specifications](./docs/requirements.md)** - Full PRD including data model, user stories, validation rules, and implementation roadmap
+- **[API Documentation](./docs/api.md)** - REST API endpoints and data model specifications
 - **[Next.js Documentation](https://nextjs.org/docs)** - Framework documentation
 - **[ShadCN UI](https://ui.shadcn.com/)** - UI component library
 - **[crudcrud.com API](https://crudcrud.com)** - Temporary data persistence service
 
-## Updating CrudCrud Resource ID
+## Dynamic Resource ID Management
 
-CrudCrud.com provides free, temporary REST API endpoints that **expire after 24 hours**. If you see "Failed to fetch" errors or API connection issues, you'll need to generate a new resource ID.
+The application automatically handles CrudCrud's 24-hour resource ID expiration:
 
-### How to Check if Your Resource ID is Expired
+### How It Works
 
-1. Open your browser and navigate to:
-   ```
-   https://crudcrud.com/api/YOUR_RESOURCE_ID/campaigns
-   ```
-   Replace `YOUR_RESOURCE_ID` with your current resource ID from `lib/api/client.ts`.
+1. **Automatic Fetching**: On first login, the system fetches a fresh resource ID from CrudCrud
+2. **Local Caching**: Resource ID is stored in localStorage with a timestamp
+3. **Expiration Tracking**: System checks if the resource ID is older than 24 hours
+4. **Auto-Refresh**: Expired resource IDs are automatically replaced with new ones
+5. **Retry Logic**: API errors due to expired resources trigger automatic renewal
 
-2. If you see an error page or "Resource not found", the endpoint has expired.
+### Implementation Details
 
-### How to Generate a New Resource ID
+- **Resource Manager**: `lib/api/resourceManager.ts` handles all resource ID operations
+- **Storage Keys**: 
+  - `crudcrud_resource_id` - The current resource ID
+  - `crudcrud_resource_timestamp` - When it was created
+- **Expiration**: 24 hours from creation time
+- **Persistence**: Resource IDs are kept across sessions (even after logout) if not expired
 
-1. Visit **[https://crudcrud.com/](https://crudcrud.com/)** in your browser
+### Manual Management (Advanced)
 
-2. The website will automatically generate a unique resource ID and display it at the top of the page. It will look like:
-   ```
-   https://crudcrud.com/api/a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6
-   ```
+If needed, you can manually manage resource IDs:
 
-3. Copy the **resource ID** (the part after `/api/`). For example: `a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6`
+**View current resource ID:**
+```javascript
+// In browser console
+localStorage.getItem('crudcrud_resource_id')
+localStorage.getItem('crudcrud_resource_timestamp')
+```
 
-4. Update the resource ID in **`lib/api/client.ts`**:
-   ```typescript
-   const BASE_URL = 'https://crudcrud.com/api/YOUR_NEW_RESOURCE_ID';
-   ```
+**Clear cached resource ID:**
+```javascript
+// In browser console
+localStorage.removeItem('crudcrud_resource_id')
+localStorage.removeItem('crudcrud_resource_timestamp')
+// Or use DevTools → Application → Local Storage
+```
 
-5. Restart your development server:
-   ```bash
-   npm run dev
-   ```
+**Check expiration status:**
+- Open browser console on the app
+- Look for log messages like:
+  - `✓ Using cached resource ID: abc123 (expires: ...)`
+  - `⚠️ Resource ID expired, fetching new one...`
+  - `🔑 New CrudCrud resource ID stored: xyz789`
 
-6. Test the connection by logging in and navigating to the dashboard. You should see the campaigns table without errors.
+### Troubleshooting
 
-**Important Notes:**
-- Each CrudCrud endpoint is isolated - data created with one resource ID cannot be accessed by another
-- CrudCrud is for development/PoC only - production apps should use a proper database
-- The free tier has rate limits (create: 1/sec, read: 10/sec, update/delete: 5/sec per resource)
+**"Failed to fetch" errors:**
+- The system should automatically retry with a new resource ID
+- Check browser console for detailed error messages
+- Ensure internet connection is active
+- Try clearing the cached resource ID manually
+
+**Data appears to be lost:**
+- CrudCrud resource IDs are isolated - each ID has its own data store
+- When a new resource ID is generated, previous data is not accessible
+- This is expected behavior for the PoC setup
+- For production, use a persistent database
+
+## ~~Updating CrudCrud Resource ID~~ (Deprecated)
+
+**Note**: This section is deprecated. The system now handles resource IDs automatically. See "Dynamic Resource ID Management" above.
 
 ## Key Security Features (PoC)
 

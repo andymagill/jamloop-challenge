@@ -1,3 +1,5 @@
+import { getResourceId, clearResourceId } from './resourceManager';
+
 // Campaign data model
 export interface Campaign {
   _id?: string; // crudcrud.com provides this
@@ -17,17 +19,25 @@ export interface Campaign {
   screens: string[]; // CTV, Mobile Device, Web Browser
 }
 
-// CrudCrud.com API URL - hardcoded as per PoC requirements
-const BASE_URL = 'https://crudcrud.com/api/7a9ddccaf6e347b7b161e8c1a4d8c394';
-
 const CAMPAIGNS_ENDPOINT = '/campaigns';
 
-// Generic API request handler
+/**
+ * Gets the base URL with a valid resource ID
+ * Dynamically fetches or retrieves cached resource ID
+ */
+async function getBaseUrl(): Promise<string> {
+  const resourceId = await getResourceId();
+  return `https://crudcrud.com/api/${resourceId}`;
+}
+
+// Generic API request handler with retry logic for expired resources
 async function apiRequest<T>(
   endpoint: string,
-  options?: RequestInit
+  options?: RequestInit,
+  retryCount: number = 0
 ): Promise<T> {
-  const url = `${BASE_URL}${endpoint}`;
+  const baseUrl = await getBaseUrl();
+  const url = `${baseUrl}${endpoint}`;
   
   try {
     const response = await fetch(url, {
@@ -38,8 +48,29 @@ async function apiRequest<T>(
       },
     });
 
+    // Handle expired resource (400, 404, or 410)
+    // 400 often comes with CORS errors when resource is expired
+    if ((response.status === 400 || response.status === 404 || response.status === 410) && retryCount === 0) {
+      console.warn(`Resource appears to be expired (status: ${response.status}), fetching new resource ID...`);
+      clearResourceId();
+      // Retry once with a new resource ID
+      return apiRequest<T>(endpoint, options, retryCount + 1);
+    }
+
     if (!response.ok) {
       const errorText = await response.text();
+      
+      // Provide user-friendly error messages
+      if (response.status === 400) {
+        throw new Error('Resource expired or invalid. Please refresh the page.');
+      } else if (response.status === 404) {
+        throw new Error('Resource not found. The CrudCrud endpoint may have expired. Please refresh the page.');
+      } else if (response.status === 410) {
+        throw new Error('Resource has been deleted or expired. Please refresh the page.');
+      } else if (response.status >= 500) {
+        throw new Error('CrudCrud service is currently unavailable. Please try again later.');
+      }
+      
       throw new Error(`API request failed: ${response.status} ${response.statusText} - ${errorText}`);
     }
 
@@ -50,6 +81,18 @@ async function apiRequest<T>(
 
     return response.json();
   } catch (error) {
+    // Handle CORS errors which often indicate expired resources
+    if (error instanceof TypeError && error.message.includes('fetch')) {
+      // If this is the first attempt, try clearing resource ID and retrying
+      if (retryCount === 0) {
+        console.log('⚠️ Network/CORS error detected (likely expired resource), retrying with new ID...');
+        clearResourceId();
+        return apiRequest<T>(endpoint, options, retryCount + 1);
+      }
+      throw new Error('Network error: Unable to connect to CrudCrud. The resource may have expired. Please refresh the page.');
+    }
+    
+    // For other errors, log and re-throw
     console.error('API Request Error:', error);
     throw error;
   }

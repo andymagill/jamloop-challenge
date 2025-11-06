@@ -5,6 +5,7 @@ import { useAuth } from '@/lib/auth/AuthContext';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Campaign, getAllCampaigns } from '@/lib/api/client';
+import { initializeResourceId, getResourceIdInfo } from '@/lib/api/resourceManager';
 
 export default function DashboardPage() {
   const { userId, logout } = useAuth();
@@ -12,13 +13,26 @@ export default function DashboardPage() {
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [resourceIdStatus, setResourceIdStatus] = useState<string>('');
 
-  // Fetch campaigns on mount
+  // Initialize resource ID first, then fetch campaigns
   useEffect(() => {
-    async function fetchCampaigns() {
+    async function initializeAndFetch() {
+      if (!userId) return;
+
       try {
         setLoading(true);
         setError(null);
+        
+        // Step 1: Initialize/validate resource ID
+        setResourceIdStatus('Validating CrudCrud connection...');
+        console.log('🔄 Initializing resource ID...');
+        
+        const resourceId = await initializeResourceId();
+        console.log('✅ Resource ID ready:', resourceId);
+        
+        // Step 2: Fetch campaigns
+        setResourceIdStatus('Loading campaigns...');
         const allCampaigns = await getAllCampaigns();
         
         // Client-side filter: only show campaigns for the current user
@@ -27,18 +41,23 @@ export default function DashboardPage() {
         );
         
         setCampaigns(userCampaigns);
+        setResourceIdStatus('');
       } catch (err) {
-        console.error('Error fetching campaigns:', err);
+        console.error('Error during initialization:', err);
         const errorMessage = err instanceof Error ? err.message : 'Unknown error';
-        setError(`Failed to fetch campaigns. ${errorMessage.includes('Failed to fetch') ? 'Please check your network connection or ensure the CrudCrud endpoint is accessible.' : errorMessage}`);
+        
+        if (errorMessage.includes('Failed to obtain') || errorMessage.includes('fetch')) {
+          setError('Unable to connect to CrudCrud. Please check your internet connection and try again.');
+        } else {
+          setError(`Failed to load dashboard. ${errorMessage}`);
+        }
+        setResourceIdStatus('');
       } finally {
         setLoading(false);
       }
     }
 
-    if (userId) {
-      fetchCampaigns();
-    }
+    initializeAndFetch();
   }, [userId]);
 
   const handleLogout = () => {
@@ -107,7 +126,10 @@ export default function DashboardPage() {
 
             {loading && (
               <div className="text-center py-8">
-                <p className="text-gray-600">Loading campaigns...</p>
+                <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mb-2"></div>
+                <p className="text-gray-600">
+                  {resourceIdStatus || 'Loading campaigns...'}
+                </p>
               </div>
             )}
 

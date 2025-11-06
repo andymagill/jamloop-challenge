@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { createContext, useContext, useState, ReactNode } from 'react';
 
 // Hardcoded user credentials for simulation
 const VALID_USERS = {
@@ -12,9 +12,10 @@ export type UserId = keyof typeof VALID_USERS;
 
 interface AuthContextType {
   userId: UserId | null;
-  login: (username: string, password: string) => boolean;
+  login: (username: string, password: string) => Promise<boolean>;
   logout: () => void;
   isAuthenticated: boolean;
+  isLoading: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -32,20 +33,39 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   });
   const [isLoading, setIsLoading] = useState(false);
 
-  const login = (username: string, password: string): boolean => {
-    // Check if credentials match
-    if (username in VALID_USERS && VALID_USERS[username as UserId] === password) {
-      const user = username as UserId;
-      setUserId(user);
-      localStorage.setItem(AUTH_STORAGE_KEY, user);
-      return true;
+  // Note: Resource ID initialization moved to dashboard page
+  // This keeps login fast and initializes resources when actually needed
+
+  const login = async (username: string, password: string): Promise<boolean> => {
+    setIsLoading(true);
+    
+    try {
+      // Check if credentials match
+      if (username in VALID_USERS && VALID_USERS[username as UserId] === password) {
+        const user = username as UserId;
+        
+        // Just authenticate - resource ID will be initialized on dashboard
+        setUserId(user);
+        localStorage.setItem(AUTH_STORAGE_KEY, user);
+        setIsLoading(false);
+        return true;
+      }
+      
+      setIsLoading(false);
+      return false;
+    } catch (error) {
+      console.error('Login error:', error);
+      setIsLoading(false);
+      return false;
     }
-    return false;
   };
 
   const logout = () => {
     setUserId(null);
     localStorage.removeItem(AUTH_STORAGE_KEY);
+    // Note: We intentionally keep the resource ID in localStorage
+    // so it can be reused on next login if not expired
+    // This reduces unnecessary API calls to CrudCrud
   };
 
   return (
@@ -55,6 +75,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         login,
         logout,
         isAuthenticated: userId !== null,
+        isLoading,
       }}
     >
       {children}
