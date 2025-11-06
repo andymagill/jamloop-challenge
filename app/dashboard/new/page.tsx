@@ -8,6 +8,7 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { createCampaign, Campaign } from '@/lib/api/client';
 import { toast } from 'sonner';
+import { Button } from '@/components/ui/button';
 
 export default function NewCampaignPage() {
   const { userId, logout } = useAuth();
@@ -52,12 +53,13 @@ export default function NewCampaignPage() {
 
         <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="mb-6">
-            <button
+            <Button
               onClick={() => router.push('/dashboard')}
-              className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+              variant="link"
+              className="px-0"
             >
-               Back to Dashboard
-            </button>
+              ← Back to Dashboard
+            </Button>
           </div>
 
           <div className="mb-6">

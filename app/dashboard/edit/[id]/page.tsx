@@ -117,12 +117,12 @@ export default function EditCampaignPage() {
           <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <div className="text-center">
               <h1 className="text-2xl font-bold text-gray-900 mb-4">Campaign Not Found</h1>
-              <button
+              <Button
                 onClick={() => router.push('/dashboard')}
-                className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                variant="link"
               >
-                 Back to Dashboard
-              </button>
+                ← Back to Dashboard
+              </Button>
             </div>
           </main>
         </div>
@@ -139,12 +139,12 @@ export default function EditCampaignPage() {
             <div className="text-center">
               <h1 className="text-2xl font-bold text-gray-900 mb-4">Unauthorized</h1>
               <p className="text-gray-600 mb-4">You do not have permission to edit this campaign.</p>
-              <button
+              <Button
                 onClick={() => router.push('/dashboard')}
-                className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                variant="link"
               >
-                 Back to Dashboard
-              </button>
+                ← Back to Dashboard
+              </Button>
             </div>
           </main>
         </div>
@@ -159,12 +159,13 @@ export default function EditCampaignPage() {
 
         <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="mb-6">
-            <button
+            <Button
               onClick={() => router.push('/dashboard')}
-              className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+              variant="link"
+              className="px-0"
             >
-               Back to Dashboard
-            </button>
+              ← Back to Dashboard
+            </Button>
           </div>
 
           {isLoading ? (
